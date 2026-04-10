@@ -16,6 +16,8 @@ py -3 -m pip install -r requirements.txt
 run_gui.bat
 ```
 
+Parancsikon ikonhoz: a `assets/tecsoo-letolto.ico` fájlt tudod kiválasztani a parancsikon Tulajdonságok → Ikon módosítása résznél.
+
 ### Parancssor (CLI)
 
 Interaktív (bekéri a linket):

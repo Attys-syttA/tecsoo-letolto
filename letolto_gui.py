@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import threading
+import traceback
 import tkinter as tk
 from dataclasses import dataclass
 from pathlib import Path
@@ -293,4 +294,19 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except Exception:
+        log_path = Path(__file__).resolve().with_name("gui_error.log")
+        try:
+            log_path.write_text(traceback.format_exc(), encoding="utf-8")
+        except Exception:
+            pass
+        try:
+            messagebox.showerror(
+                "Indítási hiba",
+                f"A GUI nem tudott elindulni.\nRészletek: {log_path}",
+            )
+        except Exception:
+            pass
+        raise

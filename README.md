@@ -76,7 +76,7 @@ Ha szeretnéd “igazi” alkalmazásként futtatni (konzol nélkül), készíth
 build_exe.bat
 ```
 
-Kimenet: `dist/TecsoLetolto.exe`
+Kimenet: `artifacts/TecsoLetolto.exe`
 
 Megjegyzés: az így készült `.exe`-t a SmartScreen/Defender néha figyelmeztetésként jelölheti (különösen ha nincs aláírva) — ez gyakori saját build-eknél.
 
@@ -88,4 +88,4 @@ Készít egy olyan egyfájlos telepítőt, ami indításkor felkínálja a célm
 build_portable_installer.bat
 ```
 
-Kimenet: `installer_dist/TecsoLetolto-Installer.exe`
+Kimenet: `artifacts/TecsoLetolto-Installer.exe`

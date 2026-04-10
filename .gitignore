@@ -8,3 +8,7 @@ downloads/
 build/
 dist/
 *.spec
+
+installer/_payload/
+installer/payload.zip
+installer_dist/

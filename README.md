@@ -67,3 +67,15 @@ Keresés (a pontos csomagnév eltérhet):
 winget search ffmpeg
 choco search ffmpeg
 ```
+
+## EXE készítés (opcionális)
+
+Ha szeretnéd “igazi” alkalmazásként futtatni (konzol nélkül), készíthetsz egy `.exe`-t PyInstallerrel:
+
+```bat
+build_exe.bat
+```
+
+Kimenet: `dist/TecsoLetolto.exe`
+
+Megjegyzés: az így készült `.exe`-t a SmartScreen/Defender néha figyelmeztetésként jelölheti (különösen ha nincs aláírva) — ez gyakori saját build-eknél.

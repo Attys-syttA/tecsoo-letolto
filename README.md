@@ -79,3 +79,13 @@ build_exe.bat
 Kimenet: `dist/TecsoLetolto.exe`
 
 Megjegyzés: az így készült `.exe`-t a SmartScreen/Defender néha figyelmeztetésként jelölheti (különösen ha nincs aláírva) — ez gyakori saját build-eknél.
+
+## “Telepítős” csomag (portable installer)
+
+Készít egy olyan egyfájlos telepítőt, ami indításkor felkínálja a célmappa kiválasztását, majd kicsomagolja az alkalmazást **és a szükséges `ffmpeg`/`ffprobe` fájlokat**:
+
+```bat
+build_portable_installer.bat
+```
+
+Kimenet: `installer_dist/TecsoLetolto-Installer.exe`

@@ -13,6 +13,42 @@ import yt_dlp
 DEFAULT_FFMPEG_DIR = r"E:\ffmpeg-2026-04-09-git-d3d0b7a5ee-essentials_build\bin"
 
 
+def _portable_ffmpeg_dirs() -> list[str]:
+    candidates: list[Path] = []
+
+    # Non-frozen: relative to this file
+    try:
+        candidates.append(Path(__file__).resolve().parent / "ffmpeg" / "bin")
+        candidates.append(Path(__file__).resolve().parent / "ffmpeg")
+    except Exception:
+        pass
+
+    # Frozen (PyInstaller): relative to the executable location
+    try:
+        exe_dir = Path(sys.executable).resolve().parent
+        candidates.append(exe_dir / "ffmpeg" / "bin")
+        candidates.append(exe_dir / "ffmpeg")
+    except Exception:
+        pass
+
+    # Current working directory fallbacks
+    try:
+        cwd = Path.cwd()
+        candidates.append(cwd / "ffmpeg" / "bin")
+        candidates.append(cwd / "ffmpeg")
+    except Exception:
+        pass
+
+    seen: set[str] = set()
+    out: list[str] = []
+    for c in candidates:
+        s = str(c)
+        if s not in seen:
+            seen.add(s)
+            out.append(s)
+    return out
+
+
 def _find_ffmpeg_dir(cli_value: str | None) -> str | None:
     if cli_value:
         return cli_value
@@ -21,6 +57,9 @@ def _find_ffmpeg_dir(cli_value: str | None) -> str | None:
         return env_value
     if Path(DEFAULT_FFMPEG_DIR).is_dir():
         return DEFAULT_FFMPEG_DIR
+    for d in _portable_ffmpeg_dirs():
+        if Path(d).is_dir():
+            return d
     return None
 
 

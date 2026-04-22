@@ -12,12 +12,19 @@ DEFAULT_FFMPEG_DIR = r"E:\ffmpeg-2026-04-09-git-d3d0b7a5ee-essentials_build\bin"
 
 def _copy_ffmpeg_bin(ffmpeg_dir: Path, dest_dir: Path) -> None:
     dest_dir.mkdir(parents=True, exist_ok=True)
+
+    # Copy the whole bin dir (exes, optional dlls) so the portable package
+    # doesn't depend on machine-local codecs/binaries.
+    # Still validate the minimum expected tools exist.
     needed = ["ffmpeg.exe", "ffprobe.exe"]
     missing = [n for n in needed if not (ffmpeg_dir / n).is_file()]
     if missing:
         raise FileNotFoundError(f"Missing in {ffmpeg_dir}: {', '.join(missing)}")
-    for name in needed:
-        shutil.copy2(ffmpeg_dir / name, dest_dir / name)
+
+    for src in ffmpeg_dir.iterdir():
+        if not src.is_file():
+            continue
+        shutil.copy2(src, dest_dir / src.name)
 
 
 def _make_payload_zip(payload_dir: Path, out_zip: Path) -> None:
@@ -91,4 +98,3 @@ def main(argv: list[str]) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv[1:]))
-

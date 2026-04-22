@@ -38,7 +38,7 @@ Videó letöltés (összefűzés mp4-be):
 run.bat --mode video --container mp4 "https://www.youtube.com/watch?v=..."
 ```
 
-Kimenet alapból: `./downloads`
+Kimenet alapból: `./downloads` (EXE esetén alapból: `~/Downloads/tecsoo-letolto`)
 
 ## FFmpeg
 

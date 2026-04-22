@@ -40,12 +40,12 @@ def main() -> int:
     state = UiState()
 
     url_var = tk.StringVar()
-    output_var = tk.StringVar(value=str((Path(__file__).resolve().parent / "downloads").resolve()))
+    output_var = tk.StringVar(value=str(letolto.default_download_dir()))
     mode_var = tk.StringVar(value="audio")
     playlist_var = tk.BooleanVar(value=False)
     verbose_var = tk.BooleanVar(value=False)
 
-    ffmpeg_var = tk.StringVar(value=letolto.DEFAULT_FFMPEG_DIR)
+    ffmpeg_var = tk.StringVar(value=(letolto._find_ffmpeg_dir(None) or ""))
 
     audio_format_var = tk.StringVar(value="mp3")
     audio_quality_var = tk.StringVar(value="192")
@@ -99,12 +99,13 @@ def main() -> int:
 
     def test_ffmpeg() -> None:
         ffdir = ffmpeg_var.get().strip()
+        ffdir = letolto._find_ffmpeg_dir(ffdir or None)
         if not ffdir:
-            messagebox.showerror("FFmpeg", "Add meg az FFmpeg mappát.")
+            messagebox.showerror("FFmpeg", "Nem találtam FFmpeg-et. Add meg a bin mappát (ahol az ffmpeg.exe van).")
             return
         ok, msg = letolto._check_ffmpeg(ffdir)
         if ok:
-            messagebox.showinfo("FFmpeg", f"OK: {msg}")
+            messagebox.showinfo("FFmpeg", f"OK: {msg}\n\nHasználva: {ffdir}")
         else:
             messagebox.showerror("FFmpeg", msg)
 
@@ -153,6 +154,9 @@ def main() -> int:
         if not ok:
             messagebox.showerror("FFmpeg", f"FFmpeg ellenőrzés sikertelen:\n{msg}")
             return
+
+        if not ffmpeg_var.get().strip():
+            ffmpeg_var.set(ffmpeg_dir)
 
         logger = TkLogger(ui_append)
 

@@ -8,9 +8,30 @@ from pathlib import Path
 import re
 
 import yt_dlp
+from yt_dlp.utils import DownloadError
 
 
 DEFAULT_FFMPEG_DIR = r"E:\ffmpeg-2026-04-09-git-d3d0b7a5ee-essentials_build\bin"
+
+
+def default_download_dir() -> Path:
+    """
+    Default output directory.
+
+    Important: for PyInstaller one-file builds, __file__ points into a temporary
+    _MEI... folder, so writing downloads next to the script would end up in a
+    temp directory (prone to AV/Explorer locks and cleanup). Use a stable,
+    user-writable location instead.
+    """
+
+    is_frozen = bool(getattr(sys, "frozen", False) or hasattr(sys, "_MEIPASS"))
+    if is_frozen:
+        home = Path.home()
+        downloads = home / "Downloads"
+        base = downloads if downloads.exists() else home
+        return (base / "tecsoo-letolto").resolve()
+
+    return (Path(__file__).resolve().parent / "downloads").resolve()
 
 
 def _portable_ffmpeg_dirs() -> list[str]:
@@ -55,11 +76,11 @@ def _find_ffmpeg_dir(cli_value: str | None) -> str | None:
     env_value = os.environ.get("FFMPEG_DIR") or os.environ.get("YTDLP_FFMPEG_DIR")
     if env_value:
         return env_value
-    if Path(DEFAULT_FFMPEG_DIR).is_dir():
-        return DEFAULT_FFMPEG_DIR
     for d in _portable_ffmpeg_dirs():
         if Path(d).is_dir():
             return d
+    if Path(DEFAULT_FFMPEG_DIR).is_dir():
+        return DEFAULT_FFMPEG_DIR
     return None
 
 
@@ -104,8 +125,15 @@ def _ydl_common_opts(
         "restrictfilenames": False,
         "noplaylist": not allow_playlist,
         "nopart": False,
+        "continuedl": True,
         "overwrites": False,
         "ignoreerrors": False,
+        # Network robustness (YouTube/CDN hiccups, slow connections)
+        "socket_timeout": 30,
+        "retries": 10,
+        "fragment_retries": 10,
+        # Windows can temporarily lock files (Defender/Explorer preview); retry more.
+        "file_access_retries": 30,
         "quiet": not verbose,
         "no_warnings": not verbose,
         "ffmpeg_location": ffmpeg_dir,
@@ -136,6 +164,68 @@ def sanitize_windows_filename_base(name: str) -> str:
     if len(base) > 200:
         base = base[:200].rstrip(". ")
     return base
+
+
+_YOUTUBE_ID_RE = re.compile(r"(?:v=|youtu\.be/)([A-Za-z0-9_-]{11})")
+
+
+def _extract_youtube_ids(urls: list[str]) -> set[str]:
+    ids: set[str] = set()
+    for u in urls:
+        m = _YOUTUBE_ID_RE.search(u)
+        if m:
+            ids.add(m.group(1))
+    return ids
+
+
+def _delete_partial_files_for_ids(output_dir: Path, video_ids: set[str]) -> int:
+    deleted = 0
+    try:
+        for p in output_dir.iterdir():
+            if not p.is_file():
+                continue
+            name = p.name
+            if not name.endswith(".part"):
+                continue
+            # Our outtmpl includes " [%(id)s]" so we can target only relevant .part files.
+            if any(f"[{vid}]" in name for vid in video_ids):
+                try:
+                    p.unlink()
+                    deleted += 1
+                except Exception:
+                    pass
+    except Exception:
+        return deleted
+    return deleted
+
+
+def _download_with_416_fallback(urls: list[str], opts: dict, *, output_dir: Path) -> None:
+    """
+    Workaround for HTTP 416 (broken resume / stale partial file state).
+
+    This can happen after a previous interrupted download or a Windows file-lock
+    (rename from .part -> final failed). In that case, deleting the related
+    .part files and retrying without resume is typically sufficient.
+    """
+
+    try:
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            ydl.download(urls)
+        return
+    except DownloadError as e:
+        msg = str(e)
+        if "HTTP Error 416" not in msg and "Requested range not satisfiable" not in msg:
+            raise
+
+        video_ids = _extract_youtube_ids(urls)
+        if video_ids:
+            _delete_partial_files_for_ids(output_dir, video_ids)
+
+        retry_opts = dict(opts)
+        retry_opts["continuedl"] = False
+        with yt_dlp.YoutubeDL(retry_opts) as ydl:
+            ydl.download(urls)
+        return
 
 
 def download_audio(
@@ -173,8 +263,7 @@ def download_audio(
             ],
         }
     )
-    with yt_dlp.YoutubeDL(opts) as ydl:
-        ydl.download(urls)
+    _download_with_416_fallback(urls, opts, output_dir=output_dir)
 
 
 def download_video(
@@ -200,8 +289,7 @@ def download_video(
             "merge_output_format": container,
         }
     )
-    with yt_dlp.YoutubeDL(opts) as ydl:
-        ydl.download(urls)
+    _download_with_416_fallback(urls, opts, output_dir=output_dir)
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
@@ -223,8 +311,8 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument(
         "-o",
         "--output",
-        default=str(Path(__file__).resolve().parent / "downloads"),
-        help="Kimeneti mappa (alapértelmezett: ./downloads)",
+        default=str(default_download_dir()),
+        help="Kimeneti mappa (alapértelmezett: ./downloads, EXE esetén: ~/Downloads/tecsoo-letolto)",
     )
     parser.add_argument(
         "--ffmpeg-dir",

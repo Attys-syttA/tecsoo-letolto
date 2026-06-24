@@ -1,15 +1,24 @@
 __pycache__/
 *.pyc
+*.egg-info/
 
 downloads/
 .venv/
+.venv-build/
+.venv-dev/
+venv/
+env/
 .env
+.serena/
 
 build/
 dist/
+release/
 *.spec
 
 installer/_payload/
 installer/payload.zip
 installer_dist/
 artifacts/
+
+vendor/

@@ -29,6 +29,21 @@ release\TecsoLetolto\
 
 Ebbe csak runtime payload kerulhet, fejlesztoi forras, teszt, cache vagy user media nem.
 
+## Installer build
+
+Ha a friss portable release-bol Windows telepitot is szeretnel kesziteni:
+
+```bat
+scripts\build_installer.bat
+```
+
+Ez ujraepiti es ellenorzi a `release\TecsoLetolto\` mappat, majd legyartja:
+
+- `artifacts\TecsoLetolto-Installer.exe`
+- `artifacts\TecsoLetolto-Installer-<version>.exe`
+
+Az uj installer a mostani GUI payloadot csomagolja be, nem a regi aprilisi IExpress csomagot.
+
 ## yt-dlp vendor beszerzes
 
 `yt-dlp.exe` nem runtime Python dependency es nem a rendszer `PATH`-bol jon. A build elott a hivatalos stable GitHub release-bol kell letolteni:

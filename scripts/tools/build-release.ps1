@@ -7,6 +7,28 @@ $releaseRoot = Join-Path $repoRoot "release"
 $releaseDir = Join-Path $releaseRoot "TecsoLetolto"
 $buildDir = Join-Path $repoRoot "build"
 
+function Compress-WithRetry {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$SourcePath,
+        [Parameter(Mandatory = $true)]
+        [string]$DestinationPath
+    )
+
+    $attempts = 5
+    for ($attempt = 1; $attempt -le $attempts; $attempt++) {
+        try {
+            Compress-Archive -Path $SourcePath -DestinationPath $DestinationPath -CompressionLevel Optimal
+            return
+        } catch {
+            if ($attempt -eq $attempts) {
+                throw
+            }
+            Start-Sleep -Seconds 2
+        }
+    }
+}
+
 function Remove-RepoChild {
     param(
         [Parameter(Mandatory = $true)]
@@ -104,7 +126,7 @@ $zipPath = Join-Path $repoRoot "artifacts\TecsoLetolto-$version.zip"
 if (Test-Path -LiteralPath $zipPath) {
     Remove-Item -LiteralPath $zipPath -Force
 }
-Compress-Archive -Path $releaseDir -DestinationPath $zipPath -CompressionLevel Optimal
+Compress-WithRetry -SourcePath $releaseDir -DestinationPath $zipPath
 
 Write-Host "Release build ready: $releaseDir"
 Write-Host "Release ZIP ready: $zipPath"

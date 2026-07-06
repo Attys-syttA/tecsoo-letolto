@@ -2,6 +2,15 @@
 
 Append-only fejlesztoi naplo. A felhasznaloi release valtozasok kulon `docs/CHANGELOG.md` ala keruljenek, amikor a release folyamat elindul.
 
+## 2026-07-06 13:22 +02:00
+
+- Cel: Friss, a mostani GUI payloadbol epulo Windows installer build visszaallitasa a regi aprilisi telepito lecserelesere.
+- Modositott fajlok: `scripts/build_installer.bat`; `scripts/tools/build-installer.ps1`; `scripts/tools/installer-bootstrap.py`; `scripts/tools/package-release.py`; `scripts/tools/build-release.ps1`; `README.md`; `docs/BUILD.md`; `docs/RELEASE.md`; `STATE.md`; `docs/CHANGELOG.dev.md`.
+- Futtatott parancsok: `scripts\build_installer.bat`; `Get-Item artifacts\TecsoLetolto-Installer.exe`; `Get-FileHash artifacts\TecsoLetolto-Installer.exe -Algorithm SHA256`; kezi artifact masolat: `TecsoLetolto-Installer-0.1.0-dev.exe`.
+- Eredmeny: Sikeresen legyartva a friss telepito a jelenlegi release payloadbol. Az installer mar nem a regi IExpress csomag, hanem PyInstaller-alapu GUI telepito. A release ZIP csomagolas retry vedelmet kapott a rovid ideju ffmpeg fajlzarat ellen.
+- Verzio: marad `0.1.0-dev`.
+- Nyitott follow-up: kezi telepitesi smoke a friss `TecsoLetolto-Installer-0.1.0-dev.exe` futtatassal.
+
 ## 2026-06-24 17:45 +02:00
 
 - Cel: `docs/ujratervezés.md` alapjan reszletes, email-header-analyzer mintaju P&P ujratervezesi terv keszitese.

@@ -34,6 +34,7 @@ Release build:
 ```bat
 scripts\build_release.bat
 scripts\verify_release.bat
+scripts\build_installer.bat
 ```
 
 ## Dokumentacio

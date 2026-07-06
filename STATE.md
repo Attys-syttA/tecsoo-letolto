@@ -9,6 +9,13 @@
 - Current blocker: none. The old April runtime/build route has been removed, the fresh PyInstaller windowed GUI build was manually accepted, and the repo cleanup pass is complete.
 
 ## Last completed work
+- Date: 2026-07-06
+- Summary: Uj, friss kodbol epulo Windows installer build folyamat keszult. A repo mar nem a regi aprilisi IExpress installerre tamaszkodik: a `scripts\build_installer.bat` a friss `release\TecsoLetolto\` payloadbol PyInstaller-alapu telepitot gyart, es kulon verziozott artifact nevet is ad.
+- Files changed: `scripts/build_installer.bat`, `scripts/tools/build-installer.ps1`, `scripts/tools/installer-bootstrap.py`, `scripts/tools/package-release.py`, `scripts/tools/build-release.ps1`, `README.md`, `docs/BUILD.md`, `docs/RELEASE.md`, `STATE.md`, `docs/CHANGELOG.dev.md`
+- Tests/builds run: `scripts\build_installer.bat`; benne `scripts\build_release.bat`; `.venv-build\Scripts\python.exe -m pytest`; `scripts\verify_release.bat`
+- Result: Installer build green. Uj artifactok: `artifacts\TecsoLetolto-Installer.exe`, `artifacts\TecsoLetolto-Installer-0.1.0-dev.exe`; mindketto a mostani GUI-t csomagolja, amely mar tud `Csak hang` es `Video + hang` modot.
+
+## Last completed work
 - Date: 2026-06-24
 - Summary: Az aktiv ujratervezesi terv es a vendor/media dontesi fajl lezarva es `docs/codex-tasks/done/` ala mozgatva a sikeres kezi GUI smoke utan.
 - Files changed: `docs/codex-tasks/done/tecsoletolto-plug-and-play-redesign-plan-2026-06-24.md`, `docs/codex-tasks/done/vendor-and-local-media-decision-2026-06-24.md`, `STATE.md`, `docs/CHANGELOG.dev.md`

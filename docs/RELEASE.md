@@ -20,6 +20,8 @@
 
 - `release\TecsoLetolto\`
 - `artifacts\TecsoLetolto-<version>.zip`
+- `artifacts\TecsoLetolto-Installer.exe`
+- `artifacts\TecsoLetolto-Installer-<version>.exe`
 - `artifacts\build_manifest.json`
 
 Az `artifacts\build_manifest.json` tartalmazza legalabb:
